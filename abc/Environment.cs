@@ -56,32 +56,6 @@ namespace abc
             } );
         }
 
-        public void Attract3()
-        {
-            Parallel.For(0, particles.Length, i =>
-            {
-                double sumX = 0, sumY = 0;
-                double distanceX, distanceY, dist, b;
-
-                for (int j = 0; j < particles.Length; j++)
-                {
-                    if (i == j)
-                        continue;
-
-                    distanceX = particles[j].x - particles[i].x;
-                    distanceY = particles[j].y - particles[i].y;
-                    dist = Math.Sqrt(distanceX * distanceX + distanceY * distanceY);
-
-                    b = G * particles[j].mass / (dist + 0.00001);
-
-                    sumX += distanceX * b;
-                    sumY += distanceY * b;
-                }
-
-                particles[i].vx += sumX;
-                particles[i].vy += sumY;
-            });
-        }
 
         public void Attract2()
         {
@@ -90,7 +64,7 @@ namespace abc
                 double sumXi = 0, sumYi = 0;
                 for (int j = i + 1; j < particles.Length; j++)
                 {
-                    Console.WriteLine($"{i}\t{j}");
+                    //Console.WriteLine($"{i}\t{j}");
                     double distanceX = particles[j].x - particles[i].x;
                     double distanceY = particles[j].y - particles[i].y;
                     double dist = Math.Sqrt(distanceX * distanceX + distanceY * distanceY);
@@ -102,6 +76,9 @@ namespace abc
 
                     sumXi += distanceX * Ai;
                     sumYi += distanceY * Ai;
+
+                    //sumXi += distanceX * b;
+                    //sumYi += distanceY * b;
 
                     particles[j].vx += -distanceX * Aj;
                     particles[j].vy += -distanceY * Aj;

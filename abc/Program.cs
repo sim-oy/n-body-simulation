@@ -10,8 +10,8 @@ namespace abc
 {
     class Program
     {
-        const int WINDOW_WIDTH = 700;
-        const int WINDOW_HEIGHT = 700;
+        const int WINDOW_WIDTH = 500;
+        const int WINDOW_HEIGHT = 500;
 
         private static RenderWindow window;
         private static byte[] windowBuffer;
@@ -19,7 +19,7 @@ namespace abc
         static void Main(string[] args)
         {
 
-            Environment env = new Environment(30000);
+            Environment env = new Environment(20000);
 
 
             window = new RenderWindow(new VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "N-Body simulation", Styles.Default);
@@ -36,15 +36,16 @@ namespace abc
             {
                 window.DispatchEvents();
 
-                Stopwatch sw = new Stopwatch();
-                sw.Start();
+                Stopwatch sw1 = new Stopwatch(), sw2 = new Stopwatch();
+                sw1.Start(); 
+                sw2.Start();
 
                 env.Attract();
-
-                sw.Stop();
-                Console.WriteLine(sw.ElapsedMilliseconds);
-
                 env.Move();
+
+                sw1.Stop();
+                Console.Write($"calc: {sw1.ElapsedMilliseconds}\t");
+                sw1.Restart();
 
                 window.Clear();
                 windowBuffer = new byte[WINDOW_WIDTH * WINDOW_HEIGHT * 4];
@@ -52,7 +53,12 @@ namespace abc
                 windowTexture.Update(windowBuffer);
                 window.Draw(windowSprite);
                 window.Display();
-                Thread.Sleep(3000);
+                //Thread.Sleep(3000);
+
+                sw1.Stop();
+                Console.Write($"gra: {sw1.ElapsedMilliseconds}\t");
+                sw2.Stop();
+                Console.Write($"oa: {sw2.ElapsedMilliseconds}\n");
             }
         }
 
@@ -63,25 +69,26 @@ namespace abc
 
         static void DrawParticles(Environment env)
         {
-            foreach (Particle particle in env.particles)
+            //foreach (Particle particle in env.particles)
+            Parallel.ForEach(env.particles, particle =>
             {
                 /*CircleShape circ = new CircleShape(2);
                 circ.Position = new Vector2f((float)(particle.x * WINDOW_WIDTH), (float)(particle.y * WINDOW_HEIGHT));
                 circ.FillColor = new Color(0xff, 0xff, 0xff);
                 window.Draw(circ);*/
                 if (particle.x < 0 || particle.x >= 1.0 || particle.y < 0 || particle.y >= 1.0)
-                    continue;
-                
+                    return;
+
                 int x = (int)(particle.x * WINDOW_WIDTH);
                 int y = (int)(particle.y * WINDOW_HEIGHT);
 
-                int index = (y* WINDOW_WIDTH + x) * 4;
+                int index = (y * WINDOW_WIDTH + x) * 4;
 
                 windowBuffer[index] = 255;
                 windowBuffer[index + 1] = 255;
                 windowBuffer[index + 2] = 255;
                 windowBuffer[index + 3] = 255;
-            }
+            });
         }
 
         static void OnClose(object sender, EventArgs e)
